@@ -12,6 +12,21 @@
     if (document.readyState === 'complete') hide(); else window.addEventListener('load', hide, { once: true });
   }
 
+  /* ---------- Theme choice: System follows the device; Light and Dark are remembered ---------- */
+  const themeBtns = $$('[data-theme-choice]');
+  if (themeBtns.length) {
+    const root = document.documentElement;
+    const read = () => { try { const t = localStorage.getItem('fortis-theme'); return t === 'light' || t === 'dark' ? t : 'system'; } catch (e) { return 'system'; } };
+    const show = (choice) => themeBtns.forEach((b) => b.setAttribute('aria-checked', String(b.dataset.themeChoice === choice)));
+    const apply = (choice) => {
+      if (choice === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', choice);
+      try { if (choice === 'system') localStorage.removeItem('fortis-theme'); else localStorage.setItem('fortis-theme', choice); } catch (e) { /* storage blocked: the choice lasts for this page only */ }
+      show(choice);
+    };
+    show(read());
+    themeBtns.forEach((b) => b.addEventListener('click', () => apply(b.dataset.themeChoice)));
+  }
+
   /* ---------- Word-by-word headline reveal ---------- */
   $$('.words').forEach((el) => {
     let i = 0;
