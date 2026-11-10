@@ -213,6 +213,28 @@ h1, h2, h3, h4 { color: var(--ink); margin: 0; font-weight: 800; letter-spacing:
 @keyframes lk-open { to { grid-template-columns: 1fr; } }
 @keyframes lk-letter { from { opacity: 0; transform: translateX(var(--sx)); filter: blur(6px); } }
 .loader.done { opacity: 0; visibility: hidden; }
+/* In-site clicks get a lighter loader: the mark spinning over a veil of the page colour. It waits 150ms before
+   showing, so a page that loads at once shows nothing. */
+.loader .loader-spin { display: none; position: relative; width: 56px; height: 56px; margin: 0; }
+.loader-spin .spin-a, .loader-spin .spin-b { transform-box: view-box; transform-origin: 50% 50%; animation: wall-spin 1.3s linear infinite; }
+.loader-spin .spin-b { animation-duration: .9s; animation-direction: reverse; }
+.loader-spin .dot { fill: #13955F; }
+:root[data-load="nav"] .loader { background: none; color: var(--ink); }
+:root[data-load="nav"] .loader::before { content: ""; position: absolute; inset: 0; background: var(--bg); opacity: 0; animation: ld-veil .2s ease .15s forwards; }
+:root[data-load="nav"] .loader-mark { display: none; }
+:root[data-load="nav"] .loader .loader-spin { display: block; opacity: 0; animation: ld-in .2s ease .15s forwards; }
+/* Shown again when a link to another page is clicked, until that page takes over. */
+.loader.leaving { animation: none; opacity: 1; visibility: visible; }
+:root[data-load="nav"] .loader.leaving::before { animation-name: ld-veil-again; }
+:root[data-load="nav"] .loader.leaving .loader-spin { animation-name: ld-in-again; }
+@keyframes ld-veil { to { opacity: .82; } }
+@keyframes ld-veil-again { to { opacity: .82; } }
+@keyframes ld-in { to { opacity: 1; } }
+@keyframes ld-in-again { to { opacity: 1; } }
+
+/* Notice shown while this device is offline. */
+.net-bar { position: fixed; left: 50%; bottom: 20px; z-index: 9000; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; max-width: calc(100vw - 32px); padding: 12px 18px; border-radius: 999px; background: var(--navy); color: #fff; font-size: 14px; font-weight: 700; box-shadow: 0 14px 40px rgba(7, 22, 50, .35); }
+.net-bar::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #F2C46D; flex: none; }
 @keyframes loader-out { to { opacity: 0; visibility: hidden; } }
 .nav-links { display: flex; align-items: center; gap: 6px; list-style: none; margin: 0; padding: 0; }
 .nav-item { position: relative; }

@@ -4,12 +4,61 @@
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
-  /* ---------- Page loader: hide once everything has loaded (at least 2.4 seconds, so the lock-in animation finishes) ---------- */
+  /* ---------- Page loader ----------
+     A reload, or the first page of a visit, plays the full Lock-in and holds it for 2.4 seconds so it can finish.
+     In-site clicks show the spinning mark instead, only for as long as the page takes to load. The page head sets
+     data-load to "full" or "nav" before first paint. */
   const loader = $('#loader');
   if (loader) {
+    const root = document.documentElement;
     const shown = performance.now();
-    const hide = () => setTimeout(() => loader.classList.add('done'), Math.max(0, 2400 - (performance.now() - shown)));
+    const hold = root.getAttribute('data-load') === 'nav' ? 0 : 2400;
+    const hide = () => setTimeout(() => loader.classList.add('done'), Math.max(0, hold - (performance.now() - shown)));
     if (document.readyState === 'complete') hide(); else window.addEventListener('load', hide, { once: true });
+
+    // Clicking through to another page of the site: show the spinning mark until that page takes over.
+    let leaving = 0;
+    document.addEventListener('click', (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = e.target.closest ? e.target.closest('a[href]') : null;
+      if (!a || a.target === '_blank' || a.hasAttribute('download')) return;
+      const url = new URL(a.href, location.href);
+      if (url.origin !== location.origin) return;
+      if (url.pathname === location.pathname && url.search === location.search) return; // a jump within this page
+      root.setAttribute('data-load', 'nav');
+      loader.classList.remove('done');
+      loader.classList.add('leaving');
+      clearTimeout(leaving);
+      leaving = setTimeout(() => { loader.classList.remove('leaving'); loader.classList.add('done'); }, 10000); // the click went nowhere
+    });
+    // Coming back with the Back button can restore this page as it was left: clear the loader.
+    window.addEventListener('pageshow', (e) => {
+      if (!e.persisted) return;
+      clearTimeout(leaving);
+      loader.classList.remove('leaving');
+      loader.classList.add('done');
+    });
+  }
+
+  /* ---------- Offline notice, and the service worker that replaces the browser's error page ---------- */
+  let netBar = null;
+  const showNet = () => {
+    if (navigator.onLine === false && !netBar) {
+      netBar = document.createElement('div');
+      netBar.className = 'net-bar';
+      netBar.setAttribute('role', 'status');
+      netBar.textContent = "You're offline. Pages will load again once you reconnect.";
+      document.body.appendChild(netBar);
+    } else if (navigator.onLine !== false && netBar) {
+      netBar.remove();
+      netBar = null;
+    }
+  };
+  window.addEventListener('offline', showNet);
+  window.addEventListener('online', showNet);
+  showNet();
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+    window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => { /* the site works without it */ }); });
   }
 
   /* ---------- Theme choice: System follows the device; Light and Dark are remembered ---------- */

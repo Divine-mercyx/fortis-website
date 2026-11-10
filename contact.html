@@ -8,6 +8,8 @@
   <meta name="theme-color" content="#071632">
   <meta name="color-scheme" content="light dark">
   <script>try{var t=localStorage.getItem("fortis-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <!-- Which loader to show: "full" (the Lock-in) on a reload or the first page of a visit, "nav" (the spinning mark) on in-site clicks. -->
+  <script>(function(){var d=document.documentElement,m="full";try{var n=performance.getEntriesByType("navigation")[0],seen=sessionStorage.getItem("fortis-seen");sessionStorage.setItem("fortis-seen","1");if(seen&&!(n&&n.type==="reload"))m="nav"}catch(e){}d.setAttribute("data-load",m)})()</script>
   <meta property="og:title" content="Contact and early access · Fortis">
   <meta property="og:description" content="Join Fortis early access as a design partner, talk to sales, or report a security issue.">
   <meta property="og:type" content="website">
@@ -61,7 +63,7 @@
   <symbol id="i-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 12h12"/></symbol>
   <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 9-7 9 7M5 10v10h14V10"/></symbol>
 </svg>
-<div class="loader" id="loader" aria-hidden="true"><span class="loader-mark"><span class="side sl"><span><i>f</i></span></span><svg class="walls" viewBox="0 0 56 56"><circle class="ring" cx="28" cy="28" r="5"/><g fill="none" stroke="currentColor"><g class="wall w1"><circle cx="28" cy="28" r="23" stroke-width="8" stroke-dasharray="132.5 12" transform="rotate(105 28 28)"/></g><g class="wall w2"><circle cx="28" cy="28" r="11.5" stroke-width="7" stroke-dasharray="63.3 9" transform="rotate(-22.6 28 28)"/></g></g><circle class="core" cx="28" cy="28" r="4.5"/></svg><span class="side sr"><span><i>r</i><i>t</i><i>i</i><i>s</i></span></span></span></div>
+<div class="loader" id="loader" aria-hidden="true"><svg class="loader-spin" viewBox="0 0 56 56"><g fill="none" stroke="currentColor"><g class="spin-a"><circle cx="28" cy="28" r="23" stroke-width="8" stroke-dasharray="132.5 12" transform="rotate(105 28 28)"/></g><g class="spin-b"><circle cx="28" cy="28" r="11.5" stroke-width="7" stroke-dasharray="63.3 9" transform="rotate(-22.6 28 28)"/></g></g><circle class="dot" cx="28" cy="28" r="4.5"/></svg><span class="loader-mark"><span class="side sl"><span><i>f</i></span></span><svg class="walls" viewBox="0 0 56 56"><circle class="ring" cx="28" cy="28" r="5"/><g fill="none" stroke="currentColor"><g class="wall w1"><circle cx="28" cy="28" r="23" stroke-width="8" stroke-dasharray="132.5 12" transform="rotate(105 28 28)"/></g><g class="wall w2"><circle cx="28" cy="28" r="11.5" stroke-width="7" stroke-dasharray="63.3 9" transform="rotate(-22.6 28 28)"/></g></g><circle class="core" cx="28" cy="28" r="4.5"/></svg><span class="side sr"><span><i>r</i><i>t</i><i>i</i><i>s</i></span></span></span></div>
 
 <a href="#main" class="sr-only">Skip to content</a>
 
