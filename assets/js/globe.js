@@ -1,9 +1,7 @@
 /* Fortis hero globe: a real Earth rendered with a small WebGL shader.
    No dependencies. Textures: assets/img/earth/earth-day.jpg (colour) and
    earth-aux.jpg (R = clouds, G = city lights, B = water mask). */
-(() => {
-  const host = document.getElementById('earth');
-  if (!host) return;
+const initGlobe = (host) => {
   const canvas = host.querySelector('canvas');
   const overlay = host.querySelector('.earth-overlay');
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -11,7 +9,7 @@
   const gl = canvas.getContext('webgl', { premultipliedAlpha: true, antialias: false, alpha: true });
   if (!gl) return; // static fallback image stays visible
 
-  const R = 0.78; // sphere radius as a share of half the canvas
+  const R = 0.78; // default sphere radius as a share of half the canvas
   const DEG = Math.PI / 180;
 
   const VERT = `attribute vec2 p; varying vec2 vUv; void main(){ vUv = p * .5 + .5; gl_Position = vec4(p, 0., 1.); }`;
@@ -19,9 +17,9 @@
   precision highp float;
   varying vec2 vUv;
   uniform sampler2D uDay, uAux;
-  uniform float uLon, uLat, uCloud, uPx;
+  uniform float uLon, uLat, uCloud, uPx, uR;
+  #define R uR
   uniform vec3 uSun;
-  const float R = ${R.toFixed(3)};
   const float PI = 3.14159265;
   vec2 lonLatUv(vec3 v, float lonOff) {
     float cb = cos(uLat), sb = sin(uLat);
@@ -99,7 +97,7 @@
   gl.enableVertexAttribArray(loc);
   gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
   const U = {};
-  ['uDay', 'uAux', 'uLon', 'uLat', 'uCloud', 'uPx', 'uSun'].forEach((k) => { U[k] = gl.getUniformLocation(prog, k); });
+  ['uDay', 'uAux', 'uLon', 'uLat', 'uCloud', 'uPx', 'uSun', 'uR'].forEach((k) => { U[k] = gl.getUniformLocation(prog, k); });
   const sun = [-0.42, 0.36, 0.83];
   const sl = Math.hypot(...sun);
   gl.uniform3f(U.uSun, sun[0] / sl, sun[1] / sl, sun[2] / sl);
@@ -158,6 +156,25 @@
     c.g = g;
   });
 
+  /* ---------- Story mode: the scroll story drives the view and shows commits, risks and the shield ---------- */
+  const story = host.hasAttribute('data-story');
+  const view = { lon: 17, lat: 6, r: R };
+  const goal = { lon: 17, lat: 6, r: R };
+  host.globeTarget = goal;
+  const RISKS = [[6.52, 3.38], [9.08, 7.4], [5.6, -0.19], [-1.29, 36.82], [-26.2, 28.05], [30.04, 31.24], [14.7, -17.4], [-6.8, 39.28], [33.57, -7.6], [0.35, 32.58], [-33.9, 18.4], [12.0, 8.5], [11.6, 37.4], [-4.3, 15.3]];
+  const COMMITS = [[6.4, 3.2], [6.7, 3.6], [6.3, 3.9], [6.9, 3.1], [6.5, 4.2], [6.2, 3.5], [7.0, 3.8], [6.6, 2.9], [6.8, 4.1], [6.1, 3.0]];
+  const mk = (list, cls, ring) => list.map(([lat, lon], i) => {
+    const g = el('g', { class: cls }, overlay);
+    if (ring) el('circle', { r: 11, class: 'ring', style: `animation-delay:${(i % 5) * -0.5}s` }, g);
+    el('circle', { r: 3.6, class: 'dot' }, g);
+    return { v: vec(lat, lon), g };
+  });
+  const risks = story ? mk(RISKS, 'earth-risk', true) : [];
+  const commits = story ? mk(COMMITS, 'earth-commit', false) : [];
+  const shield = story ? el('circle', { class: 'earth-shield', r: 10 }, overlay) : null;
+  const AFRICA = vec(3, 18);
+  if (story) host.setAttribute('data-chapter', '0');
+
   // Rotate a world vector into view space for centre (lon L, lat B).
   const toView = ([x, y, z], L, B) => {
     const cl = Math.cos(L), sl = Math.sin(L);
@@ -183,6 +200,7 @@
     canvas.width = canvas.height = Math.round(size * dpr);
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.uniform1f(U.uPx, 2 / canvas.width);
+    gl.uniform1f(U.uR, R);
     overlay.setAttribute('viewBox', `0 0 ${size} ${size}`);
   };
 
@@ -195,14 +213,26 @@
     const t = reduce ? 0 : (now - t0) / 1000;
     eased.x += (pointer.x - eased.x) * 0.05;
     eased.y += (pointer.y - eased.y) * 0.05;
-    const L = BASE_LON + Math.sin(t * 0.07) * 16 * DEG + eased.x * 14 * DEG;
-    const B = BASE_LAT + eased.y * -8 * DEG;
+    let L, B, Rc = R;
+    if (story) {
+      const k = reduce ? 1 : 0.07;
+      view.lon += (goal.lon - view.lon) * k;
+      view.lat += (goal.lat - view.lat) * k;
+      view.r += (goal.r - view.r) * k;
+      L = (view.lon + Math.sin(t * 0.25) * 1.5) * DEG;
+      B = view.lat * DEG;
+      Rc = view.r;
+    } else {
+      L = BASE_LON + Math.sin(t * 0.07) * 16 * DEG + eased.x * 14 * DEG;
+      B = BASE_LAT + eased.y * -8 * DEG;
+    }
+    gl.uniform1f(U.uR, Rc);
     gl.uniform1f(U.uLon, L);
     gl.uniform1f(U.uLat, B);
     gl.uniform1f(U.uCloud, -t * 0.0035);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-    const half = size / 2, rad = R * half;
+    const half = size / 2, rad = Rc * half;
     const proj = (v) => [half + v[0] * rad, half - v[1] * rad, v[2]];
     CITIES.forEach((c) => {
       const [x, y, z] = proj(toView(c.v, L, B));
@@ -222,6 +252,20 @@
       path.setAttribute('d', d);
       path.style.opacity = Math.max(0, Math.min(1, minZ * 4)).toFixed(2);
     });
+    const place = (m) => {
+      const [x, y, z] = proj(toView(m.v, L, B));
+      m.g.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)})`);
+      m.g.style.opacity = Math.max(0, Math.min(1, (z - 0.08) * 5)).toFixed(2);
+    };
+    risks.forEach(place);
+    commits.forEach(place);
+    if (shield) {
+      const [x, y, z] = proj(toView(AFRICA, L, B));
+      shield.setAttribute('cx', x.toFixed(1));
+      shield.setAttribute('cy', y.toFixed(1));
+      shield.setAttribute('r', (rad * 0.74).toFixed(1));
+      shield.style.opacity = Math.max(0, Math.min(1, z * 3)).toFixed(2);
+    }
     if (running && !reduce) requestAnimationFrame(draw);
   };
   const start = () => {
@@ -251,4 +295,5 @@
       if (reduce) { running = false; draw(performance.now()); } else start();
     })
     .catch((e) => console.warn('Globe textures unavailable, using static image.', e));
-})();
+};
+document.querySelectorAll('.earth').forEach(initGlobe);
