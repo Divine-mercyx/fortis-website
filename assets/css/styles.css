@@ -1222,3 +1222,67 @@ h1, h2, h3, h4 { color: var(--ink); margin: 0; font-weight: 800; letter-spacing:
   .docs-prose { font-size: 15.5px; }
   .docs-table td:first-child { white-space: normal; }
 }
+
+/* ---------- Scroll story: the problem, told on the Earth ---------- */
+.story { position: relative; height: 560vh; background: var(--navy); color: #C9D2E3; }
+.story::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 46vh; background: linear-gradient(180deg, #fff 0%, rgba(7, 22, 50, 0) 0%), linear-gradient(180deg, #fff, var(--navy)); pointer-events: none; z-index: 1; }
+.story-pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: center; padding: 0 clamp(20px, 5vw, 80px); }
+.story-pin::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 70% at 72% 50%, rgba(61, 123, 255, .16), transparent 70%), radial-gradient(40% 50% at 20% 85%, rgba(125, 242, 178, .06), transparent 70%); pointer-events: none; }
+.story .earth { left: auto; right: -2vw; top: 50%; width: min(58vw, 820px); transform: translateY(-50%); z-index: 2; }
+.story-copy { position: relative; z-index: 3; min-height: 360px; grid-column: 1; }
+.story-prog { position: absolute; left: -2px; top: -64px; display: flex; gap: 6px; }
+.story-prog i { width: 26px; height: 3px; border-radius: 3px; background: rgba(255, 255, 255, .18); transition: background .5s var(--ease-out), width .5s var(--ease-out); }
+.story-prog i.on { background: var(--mint); width: 44px; }
+.chap { position: absolute; left: 0; top: 0; right: 0; opacity: 0; transform: translateY(34px); filter: blur(6px); pointer-events: none; transition: opacity .7s var(--ease-out), transform .9s var(--ease-out), filter .7s var(--ease-out); }
+.chap.on { opacity: 1; transform: none; filter: none; pointer-events: auto; }
+.chap.past { transform: translateY(-34px); }
+.chap .h2 { color: #fff; margin: 12px 0 18px; }
+.chap p { font-size: clamp(16px, 1.35vw, 19px); line-height: 1.6; max-width: 34em; color: #B8C3D9; }
+.chap .btn { margin-top: 26px; }
+.accent-red { color: #FF7A70; }
+.story-hint { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 8px; font: 600 11px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: rgba(255, 255, 255, .45); transition: opacity .5s; }
+.story-hint span { width: 1px; height: 28px; background: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .7)); animation: hint 1.8s ease-in-out infinite; }
+.story.started .story-hint { opacity: 0; }
+@keyframes hint { 0% { transform: scaleY(.2); transform-origin: top; } 60% { transform: scaleY(1); transform-origin: top; } 100% { transform: scaleY(1); transform-origin: bottom; opacity: 0; } }
+
+/* what the Earth shows in each chapter */
+.story .earth-arc { transition: opacity .8s; }
+.story [data-chapter="2"] .earth-arc, .story [data-chapter="3"] .earth-arc, .story [data-chapter="4"] .earth-arc { opacity: 0 !important; }
+.story .earth-commit, .story .earth-risk { transition: none; }
+.story .earth-commit .dot { fill: var(--mint); stroke: none; }
+.story .earth-commit { visibility: hidden; }
+.story [data-chapter="1"] .earth-commit, .story [data-chapter="2"] .earth-commit { visibility: visible; }
+.story .earth-commit .dot { animation: commit 1.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.story .earth-commit:nth-child(odd) .dot { animation-delay: -.5s; }
+.story .earth-commit:nth-child(3n) .dot { animation-delay: -.9s; }
+.story .earth-risk { visibility: hidden; }
+.story [data-chapter="3"] .earth-risk, .story [data-chapter="4"] .earth-risk { visibility: visible; }
+.story .earth-risk .dot { fill: #FF5A4E; stroke: #fff; stroke-width: 1.5; transition: fill .8s; }
+.story .earth-risk .ring { fill: none; stroke: #FF5A4E; stroke-width: 1.5; transform-box: fill-box; transform-origin: center; animation: ring 2s var(--ease-out) infinite; }
+.story [data-chapter="4"] .earth-risk .dot { fill: var(--mint); }
+.story [data-chapter="4"] .earth-risk .ring { stroke: var(--mint); animation-duration: 3.2s; }
+.story .earth-shield { fill: rgba(125, 242, 178, .06); stroke: var(--mint); stroke-width: 2; stroke-dasharray: 2 9; stroke-linecap: round; filter: drop-shadow(0 0 10px rgba(125, 242, 178, .55)); transform-box: fill-box; transform-origin: center; visibility: hidden; }
+.story [data-chapter="4"] .earth-shield { visibility: visible; animation: shield 1.6s var(--ease-out) both, spin 40s linear infinite 1.6s; }
+.story [data-chapter="2"] .earth-city.hub .dot { fill: #FFC857; }
+.story [data-chapter="2"] .earth-city.hub .ring { stroke: #FFC857; animation-duration: 4s; }
+.story .earth-city text { opacity: 0; transition: opacity .6s; }
+.story [data-chapter="0"] .earth-city text, .story [data-chapter="1"] .earth-city text { opacity: 1; }
+@keyframes commit { 0%, 100% { transform: scale(1); opacity: .9; } 50% { transform: scale(2.1); opacity: .35; } }
+@keyframes shield { from { transform: scale(.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+@media (max-width: 860px) {
+  .story { height: 520vh; }
+  .story-pin { grid-template-columns: 1fr; align-content: end; padding-bottom: 8vh; }
+  .story .earth { right: 50%; top: 30%; width: min(92vw, 430px); transform: translate(50%, -50%); }
+  .story-copy { min-height: 300px; align-self: end; }
+  .story-prog { top: -34px; }
+  .chap .h2 { font-size: clamp(28px, 8vw, 38px); }
+  .story-hint { display: none; }
+}
+
+/* No pinned animation for people who ask for less motion: the chapters simply stack. */
+.story.static { height: auto; }
+.story.static .story-pin { position: relative; height: auto; display: block; padding-top: 80px; padding-bottom: 80px; }
+.story.static .earth, .story.static .story-prog, .story.static .story-hint { display: none; }
+.story.static .story-copy { min-height: 0; display: grid; gap: 56px; }
+.story.static .chap { position: static; opacity: 1; transform: none; filter: none; }
