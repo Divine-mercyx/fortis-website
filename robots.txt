@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /offline.html
+Disallow: /unavailable.html
+
+Sitemap: https://fortis-website-three.vercel.app/sitemap.xml
