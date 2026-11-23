@@ -50,6 +50,18 @@ node build.mjs
 
 The meta header sets the page `title`, `description`, which top-nav item is highlighted (`nav`), and whether the green call-to-action band appears above the footer (`cta`).
 
+## Search engines (SEO)
+
+`node build.mjs` also writes `sitemap.xml` and `robots.txt`, and gives every page a canonical link, a robots tag,
+Open Graph and Twitter tags (with `assets/img/og-image.png` as the share image) and schema.org structured data
+(Organization, WebSite, plus SoftwareApplication with naira offers on the home page and breadcrumbs elsewhere).
+
+- **Site address:** `SITE` at the top of `build.mjs` (default `https://fortis-website-three.vercel.app`). If the site moves,
+  for example to `https://fortis.dev`, change it there or build with `SITE_URL=https://fortis.dev node build.mjs`.
+- **Google Search Console:** add the site as a URL-prefix property, choose the "HTML tag" method, put the code in
+  `GOOGLE_SITE_VERIFICATION` in `build.mjs` (or the env var of that name), rebuild and deploy, then verify and submit
+  `sitemap.xml`. A page that shouldn't be indexed gets `"noindex": true` in its meta header.
+
 ## Assets
 
 ```

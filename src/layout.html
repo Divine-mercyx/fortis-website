@@ -10,9 +10,24 @@
   <script>try{var t=localStorage.getItem("fortis-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   <!-- Which loader to show: "full" (the Lock-in) on a reload or the first page of a visit, "nav" (the spinning mark) on in-site clicks. -->
   <script>(function(){var d=document.documentElement,m="full";try{var n=performance.getEntriesByType("navigation")[0],seen=sessionStorage.getItem("fortis-seen");sessionStorage.setItem("fortis-seen","1");if(seen&&!(n&&n.type==="reload"))m="nav"}catch(e){}d.setAttribute("data-load",m)})()</script>
+  <link rel="canonical" href="{{url}}">
+  <meta name="robots" content="{{robots}}">{{verification}}
+  <meta property="og:site_name" content="Fortis">
+  <meta property="og:locale" content="en_NG">
   <meta property="og:title" content="{{title}}">
   <meta property="og:description" content="{{description}}">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="{{url}}">
+  <meta property="og:image" content="{{site}}/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Fortis: security testing on every release, for African fintech">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{title}}">
+  <meta name="twitter:description" content="{{description}}">
+  <meta name="twitter:image" content="{{site}}/assets/img/og-image.png">
+  <link rel="apple-touch-icon" href="brand/fortis-icon-512.png">
+  <script type="application/ld+json">{{jsonld}}</script>
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
